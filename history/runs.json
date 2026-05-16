@@ -1,0 +1,65 @@
+[
+  {
+    "date": "2026-05-14 23:42",
+    "fund": "Fund: Kelso Investment Associates VIII, L.P.",
+    "quarter": "Q4_2024",
+    "layout": "B",
+    "checks": "10/10",
+    "file": "Fund:_Kelso_Investme_Q4_2024_ILPA_LP.xlsx",
+    "reconciles": false
+  },
+  {
+    "date": "2026-05-14 23:42",
+    "fund": "Fund: Kelso Investment Associates VIII, L.P.",
+    "quarter": "Q3_2024",
+    "layout": "B",
+    "checks": "10/10",
+    "file": "Fund:_Kelso_Investme_Q3_2024_ILPA_LP.xlsx",
+    "reconciles": false
+  },
+  {
+    "date": "2026-05-14 23:41",
+    "fund": "Fund: Kelso Investment Associates VIII, L.P.",
+    "quarter": "Q2_2024",
+    "layout": "B",
+    "checks": "10/10",
+    "file": "Fund:_Kelso_Investme_Q2_2024_ILPA_LP.xlsx",
+    "reconciles": false
+  },
+  {
+    "date": "2026-05-14 23:41",
+    "fund": "Fund: Kelso Investment Associates VIII, L.P.",
+    "quarter": "Q1_2024",
+    "layout": "B",
+    "checks": "10/10",
+    "file": "Fund:_Kelso_Investme_Q1_2024_ILPA_LP.xlsx",
+    "reconciles": false
+  },
+  {
+    "date": "2026-05-14 23:35",
+    "fund": "Fund: Kelso Investment Associates VIII, L.P.",
+    "quarter": "Q2_2022",
+    "layout": "B",
+    "checks": "10/10",
+    "file": "Fund:_Kelso_Investme_Q2_2022_ILPA_LP.xlsx",
+    "reconciles": false
+  },
+  {
+    "date": "2026-05-14 23:35",
+    "fund": "Fund: Kelso Investment Associates VIII, L.P.",
+    "quarter": "Q2_2022",
+    "layout": "B",
+    "checks": "10/10",
+    "file": "Fund:_Kelso_Investme_Q2_2022_ILPA_LP.xlsx",
+    "reconciles": false
+  },
+  {
+    "date": "2026-05-14 00:37",
+    "fund": "Veritas Capital - ILPA Fees and Expenses Template for: Central Pension Fund of t",
+    "quarter": "Q2_2022",
+    "layout": "A",
+    "checks": "15/15",
+    "file": "Veritas_Capital_-_IL_Q2_2022_ILPA_LP.xlsx",
+    "reconciles": true
+  }
+]

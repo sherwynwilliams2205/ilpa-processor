@@ -1,0 +1,9 @@
+# Never push secrets or runtime files
+.streamlit/secrets.toml
+runtime/
+runtime_src/
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+history/*.xlsx
