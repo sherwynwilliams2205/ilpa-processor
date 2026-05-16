@@ -90,8 +90,10 @@ if not check_password():
 # ─────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+
 * {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+  font-family: "DM Sans", -apple-system, BlinkMacSystemFont,
                "Helvetica Neue", Arial, sans-serif !important;
   -webkit-font-smoothing: antialiased;
   box-sizing: border-box;
@@ -103,10 +105,31 @@ st.markdown("""
 
 #MainMenu, footer, header { visibility: hidden !important; }
 .block-container {
-  padding: 36px 44px 60px !important;
-  max-width: 1080px !important;
+  padding: 40px 48px 64px !important;
+  max-width: 1100px !important;
 }
-.main { background: #F2F2F7 !important; }
+
+/* ── Cream background — matches the reference design ── */
+.main { background: #E8E5DC !important; }
+
+/* ── Pastel feature cards ── */
+.fc-green  { background: #C8D9A3 !important; }
+.fc-yellow { background: #E5D97E !important; }
+.fc-pink   { background: #D4A8C4 !important; }
+.fc-cream  { background: #F0EBE0 !important; }
+.fc-white  { background: #FFFFFF !important; }
+
+/* Icon box inside feature card */
+.ic-box {
+  width: 52px; height: 52px;
+  background: #FFFFFF;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  margin-bottom: 20px;
+  flex-shrink: 0;
+}
 
 /* ── Sidebar ── */
 section[data-testid="stSidebar"] > div:first-child {
@@ -187,70 +210,112 @@ div[data-baseweb="select"] > div:focus-within {
 
 /* ── File uploader ── */
 [data-testid="stFileUploader"] section {
-  border: 1.5px dashed rgba(60,60,67,0.25) !important;
-  border-radius: 14px !important;
-  background: #FFFFFF !important;
+  border: 2px dashed rgba(60,60,50,0.22) !important;
+  border-radius: 20px !important;
+  background: #F5F1E8 !important;
   padding: 0 !important;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
+  box-shadow: none !important;
   transition: border-color 0.2s, background 0.2s !important;
 }
 [data-testid="stFileUploader"] section:hover {
-  border-color: #0A84FF !important;
-  background: rgba(10,132,255,0.02) !important;
+  border-color: #4A7C3F !important;
+  background: rgba(200,217,163,0.25) !important;
 }
 
 /* ── Buttons ── */
 .stButton > button {
-  background: #0A84FF !important;
+  background: #1A1A1A !important;
   color: #FFFFFF !important;
   border: none !important;
-  border-radius: 12px !important;
-  padding: 12px 24px !important;
+  border-radius: 40px !important;
+  padding: 13px 28px !important;
   font-size: 15px !important;
   font-weight: 600 !important;
-  letter-spacing: -0.2px !important;
+  letter-spacing: 0.01em !important;
   width: 100% !important;
-  box-shadow: 0 2px 8px rgba(10,132,255,0.3),
-              0 1px 2px rgba(10,132,255,0.2) !important;
-  transition: filter 0.15s, box-shadow 0.15s, transform 0.1s !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+  transition: filter 0.15s, transform 0.1s !important;
 }
 .stButton > button:hover {
-  filter: brightness(1.08) !important;
-  box-shadow: 0 4px 16px rgba(10,132,255,0.4) !important;
+  filter: brightness(1.18) !important;
 }
 .stButton > button:active { transform: scale(0.985) !important; }
 
 .stDownloadButton > button {
-  background: #1C1C1E !important;
+  background: #1A1A1A !important;
   color: #FFFFFF !important;
   border: none !important;
-  border-radius: 12px !important;
-  padding: 14px 24px !important;
+  border-radius: 40px !important;
+  padding: 14px 28px !important;
   font-size: 15px !important;
   font-weight: 600 !important;
-  letter-spacing: -0.2px !important;
+  letter-spacing: 0.01em !important;
   width: 100% !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.18) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
   transition: filter 0.15s, transform 0.1s !important;
 }
-.stDownloadButton > button:hover { filter: brightness(1.18) !important; }
+.stDownloadButton > button:hover { filter: brightness(1.22) !important; }
 .stDownloadButton > button:active { transform: scale(0.985) !important; }
 
-/* ── Misc ── */
-.stSpinner > div { border-top-color: #0A84FF !important; }
-.stAlert { border-radius: 12px !important; font-size: 13px !important; }
-hr { border-color: rgba(60,60,67,0.12) !important; margin: 28px 0 !important; }
-[data-baseweb="popover"] [role="listbox"] {
+/* ── Inputs on cream bg ── */
+div[data-baseweb="select"] > div {
+  background: #F5F1E8 !important;
+  border: 1.5px solid rgba(60,60,50,0.18) !important;
   border-radius: 12px !important;
-  border: 1px solid rgba(60,60,67,0.12) !important;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.12) !important;
+  font-size: 15px !important;
+  color: #1A1A1A !important;
+  box-shadow: none !important;
+}
+div[data-baseweb="select"] > div:focus-within {
+  border-color: #4A7C3F !important;
+  box-shadow: 0 0 0 3px rgba(74,124,63,0.15) !important;
+}
+.stSelectbox label {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #6B6B5E !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.07em !important;
+}
+.stTextInput input {
+  background: #F5F1E8 !important;
+  border: 1.5px solid rgba(60,60,50,0.18) !important;
+  border-radius: 12px !important;
+  font-size: 15px !important;
+  color: #1A1A1A !important;
+}
+.stTextInput input:focus {
+  border-color: #4A7C3F !important;
+  box-shadow: 0 0 0 3px rgba(74,124,63,0.15) !important;
+}
+.stTextArea textarea {
+  background: #F5F1E8 !important;
+  border: 1.5px solid rgba(60,60,50,0.18) !important;
+  border-radius: 12px !important;
+  font-size: 14px !important;
+  color: #1A1A1A !important;
+}
+.stTextArea textarea:focus {
+  border-color: #4A7C3F !important;
+  box-shadow: 0 0 0 3px rgba(74,124,63,0.15) !important;
+}
+
+/* ── Misc ── */
+.stSpinner > div { border-top-color: #4A7C3F !important; }
+.stAlert { border-radius: 16px !important; font-size: 13px !important; }
+hr { border-color: rgba(60,60,50,0.15) !important; margin: 32px 0 !important; }
+[data-baseweb="popover"] [role="listbox"] {
+  border-radius: 16px !important;
+  border: 1px solid rgba(60,60,50,0.12) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.10) !important;
   overflow: hidden !important;
 }
 
 /* ── Status box ── */
 [data-testid="stStatusWidget"] {
-  border-radius: 12px !important;
-  border: 1px solid rgba(60,60,67,0.12) !important;
+  border-radius: 16px !important;
+  border: 1px solid rgba(60,60,50,0.15) !important;
+  background: #F5F1E8 !important;
 }
 
 /* ── Step indicator ── */
@@ -303,15 +368,30 @@ hr { border-color: rgba(60,60,67,0.12) !important; margin: 28px 0 !important; }
 #  COMPONENT HELPERS
 # ─────────────────────────────────────────────────────────────
 def eyebrow(txt):
-    return (f'<p style="font-size:12px;font-weight:600;color:#8E8E93;'
-            f'text-transform:uppercase;letter-spacing:0.07em;margin:0 0 10px;">{txt}</p>')
+    return (f'<p style="font-size:11px;font-weight:700;color:#6B6B5E;'
+            f'text-transform:uppercase;letter-spacing:0.10em;margin:0 0 12px;">{txt}</p>')
 
-def card_open(radius="14px", padding="20px 22px", extra=""):
-    return (f'<div style="background:#FFFFFF;border-radius:{radius};padding:{padding};'
-            f'box-shadow:0 1px 3px rgba(0,0,0,0.06),0 1px 1px rgba(0,0,0,0.04);{extra}">')
+def card_open(radius="20px", padding="22px 24px", extra="", bg="#FFFFFF"):
+    shadow = "0 2px 12px rgba(0,0,0,0.06)" if bg == "#FFFFFF" else "none"
+    return (f'<div style="background:{bg};border-radius:{radius};padding:{padding};'
+            f'box-shadow:{shadow};{extra}">')
 
 def card_close():
     return '</div>'
+
+def feature_card(icon, title, body, bg="#C8D9A3"):
+    """Large pastel feature card matching the reference design."""
+    return f"""
+    <div style="background:{bg};border-radius:22px;padding:28px 26px 30px;
+                min-height:190px;display:flex;flex-direction:column;">
+      <div style="width:52px;height:52px;background:#FFFFFF;border-radius:14px;
+                  display:flex;align-items:center;justify-content:center;
+                  font-size:24px;box-shadow:0 2px 10px rgba(0,0,0,0.10);
+                  margin-bottom:20px;flex-shrink:0;">{icon}</div>
+      <div style="font-size:20px;font-weight:700;color:#1A1A1A;
+                  letter-spacing:-0.3px;margin-bottom:8px;">{title}</div>
+      <div style="font-size:13px;color:#3A3A2E;line-height:1.65;flex:1;">{body}</div>
+    </div>"""
 
 def status_dot(colour):
     return f'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:{colour};margin-right:6px;vertical-align:middle;"></span>'
@@ -321,18 +401,17 @@ def pill(txt, fg, bg):
             f'padding:3px 10px;border-radius:20px;letter-spacing:0.02em;">{txt}</span>')
 
 def steps_indicator(active: int):
-    """active = 1, 2 or 3"""
     items = [("1", "Upload"), ("2", "Process"), ("3", "Download")]
     html  = '<div class="step-row">'
     for i, (num, label) in enumerate(items, 1):
         if i < active:
-            circ_bg, circ_fg, lbl_fg = "#30D158", "#FFFFFF", "#30D158"
+            circ_bg, circ_fg, lbl_fg = "#4A7C3F", "#FFFFFF", "#4A7C3F"
             num_str = "✓"
         elif i == active:
-            circ_bg, circ_fg, lbl_fg = "#0A84FF", "#FFFFFF", "#0A84FF"
+            circ_bg, circ_fg, lbl_fg = "#1A1A1A", "#FFFFFF", "#1A1A1A"
             num_str = num
         else:
-            circ_bg, circ_fg, lbl_fg = "rgba(60,60,67,0.12)", "#8E8E93", "#C7C7CC"
+            circ_bg, circ_fg, lbl_fg = "rgba(60,60,50,0.12)", "#8E8E80", "#AEAE9E"
             num_str = num
         html += f"""
         <div class="step-item">
@@ -345,10 +424,10 @@ def steps_indicator(active: int):
     return html
 
 LAYOUT_PILL = {
-    "A": pill("Layout A", "#1A7F3C", "#D1FAE5"),
-    "B": pill("Layout B", "#1D4ED8", "#DBEAFE"),
+    "A": pill("Layout A", "#2D5A1B", "#C8D9A3"),
+    "B": pill("Layout B", "#5A4A00", "#E5D97E"),
 }
-UNKNOWN_PILL = pill("Unknown", "#92400E", "#FEF3C7")
+UNKNOWN_PILL = pill("Unknown", "#5A2040", "#D4A8C4")
 
 
 # ─────────────────────────────────────────────────────────────
@@ -440,14 +519,28 @@ with st.sidebar:
 # ═════════════════════════════════════════════════════════════
 if "Process" in page:
 
+    # ── Page header — title | description | action row ───────
     st.markdown("""
-    <div style="margin-bottom:8px;">
-      <h1 style="font-size:28px;font-weight:700;color:#1C1C1E;
-                 letter-spacing:-0.6px;margin:0 0 6px;">Process Document</h1>
-      <p style="font-size:15px;color:#8E8E93;margin:0;font-weight:400;">
-        Upload an ILPA LP statement PDF. The engine detects the layout, populates
-        the master template and runs all verification checks.
-      </p>
+    <div style="display:grid;grid-template-columns:1fr 2fr auto;
+                gap:32px;align-items:center;margin-bottom:40px;">
+      <div>
+        <h1 style="font-size:34px;font-weight:800;color:#1A1A1A;
+                   letter-spacing:-0.8px;line-height:1.15;margin:0;">
+          Process<br/>Document
+        </h1>
+      </div>
+      <div style="font-size:15px;color:#5A5A4E;line-height:1.7;font-weight:400;">
+        Upload an ILPA LP statement PDF. The engine detects
+        the layout, populates the master template and runs
+        all verification checks automatically.
+      </div>
+      <div style="font-size:12px;font-weight:600;color:#6B6B5E;
+                  text-align:right;white-space:nowrap;">
+        <span style="background:#1A1A1A;color:#FFFFFF;padding:10px 22px;
+                     border-radius:40px;font-size:13px;font-weight:600;">
+          Get Started ↓
+        </span>
+      </div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -484,42 +577,35 @@ if "Process" in page:
                        "B": "Layout B  —  Income Tax Basis"}.get(layout, "Unknown")
         conf_colour = "#30D158" if conf >= 80 else ("#FF9F0A" if conf >= 50 else "#FF453A")
 
-        # Detection strip
-        st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
+        # ── Detection result — 3 pastel feature cards ──────
         st.markdown(eyebrow("Detection Result"), unsafe_allow_html=True)
 
-        c1, c2, c3 = st.columns([2, 1, 3])
+        layout_bg = {"A": "#C8D9A3", "B": "#E5D97E"}.get(layout, "#D4A8C4")
+        conf_bg   = "#C8D9A3" if conf >= 80 else ("#E5D97E" if conf >= 50 else "#D4A8C4")
+        conf_icon = "🟢" if conf >= 80 else ("🟡" if conf >= 50 else "🔴")
+
+        c1, c2, c3 = st.columns(3)
         with c1:
-            lp = LAYOUT_PILL.get(layout, UNKNOWN_PILL)
-            st.markdown(f"""
-            {card_open()}
-              <div style="font-size:11px;font-weight:600;color:#8E8E93;
-                          text-transform:uppercase;letter-spacing:0.07em;
-                          margin-bottom:10px;">Layout</div>
-              {lp}
-              <div style="font-size:12px;color:#8E8E93;margin-top:8px;">{layout_text}</div>
-            {card_close()}""", unsafe_allow_html=True)
-
+            st.markdown(feature_card(
+                icon  = "📐",
+                title = f"Layout {layout}",
+                body  = layout_text,
+                bg    = layout_bg,
+            ), unsafe_allow_html=True)
         with c2:
-            st.markdown(f"""
-            {card_open()}
-              <div style="font-size:11px;font-weight:600;color:#8E8E93;
-                          text-transform:uppercase;letter-spacing:0.07em;
-                          margin-bottom:10px;">Confidence</div>
-              <div style="font-size:30px;font-weight:700;color:{conf_colour};
-                          font-family:ui-monospace,monospace;
-                          letter-spacing:-1px;">{conf}%</div>
-            {card_close()}""", unsafe_allow_html=True)
-
+            st.markdown(feature_card(
+                icon  = conf_icon,
+                title = f"{conf}%",
+                body  = "Detection confidence based on keyword signals in the PDF.",
+                bg    = conf_bg,
+            ), unsafe_allow_html=True)
         with c3:
-            st.markdown(f"""
-            {card_open()}
-              <div style="font-size:11px;font-weight:600;color:#8E8E93;
-                          text-transform:uppercase;letter-spacing:0.07em;
-                          margin-bottom:10px;">Fund</div>
-              <div style="font-size:14px;font-weight:600;color:#1C1C1E;
-                          line-height:1.4;">{fund_nm}</div>
-            {card_close()}""", unsafe_allow_html=True)
+            st.markdown(feature_card(
+                icon  = "🏢",
+                title = "Fund",
+                body  = fund_nm,
+                bg    = "#F0EBE0",
+            ), unsafe_allow_html=True)
 
         st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
 
@@ -674,11 +760,18 @@ if "Process" in page:
 elif "History" in page:
 
     st.markdown("""
-    <h1 style="font-size:28px;font-weight:700;color:#1C1C1E;
-               letter-spacing:-0.6px;margin:0 0 6px;">History</h1>
-    <p style="font-size:15px;color:#8E8E93;margin:0 0 32px;">
-      All documents processed this session.
-    </p>""", unsafe_allow_html=True)
+    <div style="display:grid;grid-template-columns:1fr 2fr auto;
+                gap:32px;align-items:center;margin-bottom:40px;">
+      <h1 style="font-size:34px;font-weight:800;color:#1A1A1A;
+                 letter-spacing:-0.8px;line-height:1.15;margin:0;">
+        Processing<br/>History
+      </h1>
+      <p style="font-size:15px;color:#5A5A4E;line-height:1.7;margin:0;">
+        Every document processed this session — layout detected,
+        checks run, file ready to download.
+      </p>
+      <div></div>
+    </div>""", unsafe_allow_html=True)
 
     runs = load_history()
 
@@ -695,26 +788,28 @@ elif "History" in page:
         total_a = sum(1 for r in runs if r.get("layout") == "A")
         total_b = sum(1 for r in runs if r.get("layout") == "B")
 
-        for col, val, lbl, colour in zip(
-            st.columns(4),
-            [len(runs), total_a, total_b, len(runs)-total_a-total_b],
-            ["Total", "Layout A", "Layout B", "Unknown"],
-            ["#1C1C1E", "#30D158", "#0A84FF", "#FF9F0A"],
-        ):
+        kpi_cards = [
+            (len(runs),               "Total Processed", "#F0EBE0", "#1A1A1A"),
+            (total_a,                 "Layout A",        "#C8D9A3", "#2D5A1B"),
+            (total_b,                 "Layout B",        "#E5D97E", "#5A4A00"),
+            (len(runs)-total_a-total_b,"Unknown",        "#D4A8C4", "#5A2040"),
+        ]
+        for col, (val, lbl, bg, fg) in zip(st.columns(4), kpi_cards):
             with col:
                 col.markdown(f"""
-                {card_open("12px", "16px 20px")}
-                  <div style="font-size:28px;font-weight:700;color:{colour};
-                               font-family:ui-monospace,monospace;">{val}</div>
-                  <div style="font-size:11px;font-weight:600;color:#8E8E93;
-                               text-transform:uppercase;letter-spacing:0.07em;
-                               margin-top:5px;">{lbl}</div>
-                {card_close()}""", unsafe_allow_html=True)
+                <div style="background:{bg};border-radius:20px;padding:20px 22px;
+                            box-shadow:none;">
+                  <div style="font-size:32px;font-weight:800;color:{fg};
+                               font-family:ui-monospace,monospace;letter-spacing:-1px;">{val}</div>
+                  <div style="font-size:11px;font-weight:700;color:{fg};opacity:0.65;
+                               text-transform:uppercase;letter-spacing:0.09em;
+                               margin-top:6px;">{lbl}</div>
+                </div>""", unsafe_allow_html=True)
 
         st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
 
         header = """
-        <div style="background:#1C1C1E;border-radius:14px 14px 0 0;
+        <div style="background:#1A1A1A;border-radius:20px 20px 0 0;
                     padding:12px 20px;
                     display:grid;
                     grid-template-columns:3fr 100px 110px 90px 140px;
@@ -759,8 +854,8 @@ elif "History" in page:
             </div>"""
 
         st.markdown(f"""
-        <div style="border-radius:14px;overflow:hidden;
-                    box-shadow:0 1px 3px rgba(0,0,0,0.07),0 1px 1px rgba(0,0,0,0.04);">
+        <div style="border-radius:20px;overflow:hidden;
+                    box-shadow:0 2px 16px rgba(0,0,0,0.07);">
           {header}{rows_html}
         </div>""", unsafe_allow_html=True)
 
@@ -770,69 +865,50 @@ elif "History" in page:
 # ═════════════════════════════════════════════════════════════
 elif "Learn" in page:
 
+    # ── Page header ───────────────────────────────────────────
     st.markdown("""
-    <div style="margin-bottom:32px;">
-      <h1 style="font-size:28px;font-weight:700;color:#1C1C1E;
-                 letter-spacing:-0.6px;margin:0 0 6px;">Learn New Layout</h1>
-      <p style="font-size:15px;color:#8E8E93;margin:0;font-weight:400;">
+    <div style="display:grid;grid-template-columns:1fr 2fr auto;
+                gap:32px;align-items:center;margin-bottom:40px;">
+      <div>
+        <h1 style="font-size:34px;font-weight:800;color:#1A1A1A;
+                   letter-spacing:-0.8px;line-height:1.15;margin:0;">
+          Learn<br/>New Layout
+        </h1>
+      </div>
+      <div style="font-size:15px;color:#5A5A4E;line-height:1.7;font-weight:400;">
         Upload a raw PDF and its manually-solved Excel template.
-        The engine reverse-engineers the field mapping and generates a ready-to-deploy layout file.
-      </p>
+        The engine reverse-engineers the field mapping and generates
+        a ready-to-deploy layout file automatically.
+      </div>
+      <div></div>
     </div>
     """, unsafe_allow_html=True)
 
-    # ── How it works ─────────────────────────────────────────
-    st.markdown(f"""
-    {card_open("14px", "18px 22px", "margin-bottom:28px;")}
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;">
-        <div style="display:flex;gap:12px;align-items:flex-start;">
-          <div style="width:32px;height:32px;border-radius:10px;
-                      background:rgba(10,132,255,0.1);
-                      display:flex;align-items:center;justify-content:center;
-                      font-size:16px;flex-shrink:0;">1</div>
-          <div>
-            <div style="font-size:13px;font-weight:600;color:#1C1C1E;margin-bottom:3px;">
-              Upload Pair
-            </div>
-            <div style="font-size:12px;color:#8E8E93;line-height:1.6;">
-              The raw PDF from the fund and the ILPA master template
-              you've already completed manually.
-            </div>
-          </div>
-        </div>
-        <div style="display:flex;gap:12px;align-items:flex-start;">
-          <div style="width:32px;height:32px;border-radius:10px;
-                      background:rgba(48,209,88,0.12);
-                      display:flex;align-items:center;justify-content:center;
-                      font-size:16px;flex-shrink:0;">2</div>
-          <div>
-            <div style="font-size:13px;font-weight:600;color:#1C1C1E;margin-bottom:3px;">
-              Auto-Match Fields
-            </div>
-            <div style="font-size:12px;color:#8E8E93;line-height:1.6;">
-              The engine matches PDF numbers to Excel rows, infers sign
-              conventions and flags anything needing review.
-            </div>
-          </div>
-        </div>
-        <div style="display:flex;gap:12px;align-items:flex-start;">
-          <div style="width:32px;height:32px;border-radius:10px;
-                      background:rgba(255,159,10,0.12);
-                      display:flex;align-items:center;justify-content:center;
-                      font-size:16px;flex-shrink:0;">3</div>
-          <div>
-            <div style="font-size:13px;font-weight:600;color:#1C1C1E;margin-bottom:3px;">
-              Download & Deploy
-            </div>
-            <div style="font-size:12px;color:#8E8E93;line-height:1.6;">
-              Download the generated <code style="font-size:11px;background:#F2F2F7;
-              padding:1px 5px;border-radius:4px;">layout_X.py</code> file, add it
-              to the repo and push to go live.
-            </div>
-          </div>
-        </div>
-      </div>
-    {card_close()}""", unsafe_allow_html=True)
+    # ── How it works — 3 pastel feature cards ────────────────
+    st.markdown(eyebrow("How It Works"), unsafe_allow_html=True)
+    hw1, hw2, hw3 = st.columns(3)
+    with hw1:
+        st.markdown(feature_card(
+            icon  = "📄",
+            title = "Upload Pair",
+            body  = "The raw PDF from the fund and the ILPA master template you've already completed manually.",
+            bg    = "#C8D9A3",
+        ), unsafe_allow_html=True)
+    with hw2:
+        st.markdown(feature_card(
+            icon  = "🧮",
+            title = "Auto-Match Fields",
+            body  = "The engine matches PDF numbers to Excel rows, infers sign conventions and flags anything needing review.",
+            bg    = "#E5D97E",
+        ), unsafe_allow_html=True)
+    with hw3:
+        st.markdown(feature_card(
+            icon  = "🚀",
+            title = "Download & Deploy",
+            body  = "Get layout_X.py, add it to the repo, push — Streamlit Cloud redeploys in ~60 seconds.",
+            bg    = "#D4A8C4",
+        ), unsafe_allow_html=True)
+    st.markdown("<div style='height:32px'></div>", unsafe_allow_html=True)
 
     # ── Upload pair ───────────────────────────────────────────
     st.markdown(eyebrow("Step 1 — Reference Files"), unsafe_allow_html=True)
@@ -930,20 +1006,20 @@ elif "Learn" in page:
 
         # ── Stats banner ──────────────────────────────────────
         s1, s2, s3 = st.columns(3)
-        for col, val, lbl, colour in [
-            (s1, stats["matched"], "PDF Fields Matched", "#30D158"),
-            (s2, stats["fixed"],   "Fixed Values",       "#FF9F0A"),
-            (s3, stats["zero"],    "Zero Rows",          "#8E8E93"),
+        for col, val, lbl, bg, fg in [
+            (s1, stats["matched"], "PDF Fields Matched", "#C8D9A3", "#2D5A1B"),
+            (s2, stats["fixed"],   "Fixed Values",       "#E5D97E", "#5A4A00"),
+            (s3, stats["zero"],    "Zero Rows",          "#F0EBE0", "#6B6B5E"),
         ]:
             with col:
                 col.markdown(f"""
-                {card_open("12px", "16px 20px")}
-                  <div style="font-size:28px;font-weight:700;color:{colour};
-                               font-family:ui-monospace,monospace;">{val}</div>
-                  <div style="font-size:11px;font-weight:600;color:#8E8E93;
-                               text-transform:uppercase;letter-spacing:0.07em;
-                               margin-top:5px;">{lbl}</div>
-                {card_close()}""", unsafe_allow_html=True)
+                <div style="background:{bg};border-radius:20px;padding:20px 22px;">
+                  <div style="font-size:32px;font-weight:800;color:{fg};
+                               font-family:ui-monospace,monospace;letter-spacing:-1px;">{val}</div>
+                  <div style="font-size:11px;font-weight:700;color:{fg};opacity:0.65;
+                               text-transform:uppercase;letter-spacing:0.09em;
+                               margin-top:6px;">{lbl}</div>
+                </div>""", unsafe_allow_html=True)
 
         st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
 
@@ -983,8 +1059,8 @@ elif "Learn" in page:
             </div>"""
 
         st.markdown(f"""
-        <div style="border-radius:14px;overflow:hidden;
-                    box-shadow:0 1px 3px rgba(0,0,0,0.07),0 1px 1px rgba(0,0,0,0.04);
+        <div style="border-radius:20px;overflow:hidden;
+                    box-shadow:0 2px 16px rgba(0,0,0,0.07);
                     max-height:400px;overflow-y:auto;">
           <div style="background:#1C1C1E;padding:12px 20px;
                       display:grid;grid-template-columns:60px 1fr 1fr 1fr;
@@ -1072,11 +1148,19 @@ elif "Learn" in page:
 elif "Layouts" in page:
 
     st.markdown("""
-    <h1 style="font-size:28px;font-weight:700;color:#1C1C1E;
-               letter-spacing:-0.6px;margin:0 0 6px;">Layout Registry</h1>
-    <p style="font-size:15px;color:#8E8E93;margin:0 0 32px;">
-      Mapping rules that define how each fund type populates the ILPA master template.
-    </p>""", unsafe_allow_html=True)
+    <div style="display:grid;grid-template-columns:1fr 2fr auto;
+                gap:32px;align-items:center;margin-bottom:40px;">
+      <h1 style="font-size:34px;font-weight:800;color:#1A1A1A;
+                 letter-spacing:-0.8px;line-height:1.15;margin:0;">
+        Layout<br/>Registry
+      </h1>
+      <p style="font-size:15px;color:#5A5A4E;line-height:1.7;margin:0;">
+        Mapping rules that define how each fund type populates
+        the ILPA master template — sign conventions, fixed values,
+        and per-row field assignments.
+      </p>
+      <div></div>
+    </div>""", unsafe_allow_html=True)
 
     rows = [
         ("Accounting Basis",         "GAAP",                          "Income Tax Basis"),
@@ -1150,11 +1234,18 @@ elif "Layouts" in page:
 elif "Settings" in page:
 
     st.markdown("""
-    <h1 style="font-size:28px;font-weight:700;color:#1C1C1E;
-               letter-spacing:-0.6px;margin:0 0 6px;">Settings</h1>
-    <p style="font-size:15px;color:#8E8E93;margin:0 0 32px;">
-      Application status and configuration.
-    </p>""", unsafe_allow_html=True)
+    <div style="display:grid;grid-template-columns:1fr 2fr auto;
+                gap:32px;align-items:center;margin-bottom:40px;">
+      <h1 style="font-size:34px;font-weight:800;color:#1A1A1A;
+                 letter-spacing:-0.8px;line-height:1.15;margin:0;">
+        Settings
+      </h1>
+      <p style="font-size:15px;color:#5A5A4E;line-height:1.7;margin:0;">
+        Application status, loaded layouts, LLM module
+        and the product roadmap.
+      </p>
+      <div></div>
+    </div>""", unsafe_allow_html=True)
 
     # Master template
     st.markdown(eyebrow("Master Template"), unsafe_allow_html=True)
