@@ -482,7 +482,7 @@ if "Process" in page:
                     out_name = (f"{fund_nm[:22].replace(' ','_')}"
                                 f"_{quarter}_ILPA_LP.xlsx")
                     out_path = str(Path(__file__).parent / "history" / out_name)
-                    writer.write(row_data, out_path, fund_nm, layout)
+                    writer.write(row_data, out_path, fund_nm, layout, quarter)
 
                 if not reconciles:
                     st.info("Layout B  ·  E51 does not reconcile — expected for "
