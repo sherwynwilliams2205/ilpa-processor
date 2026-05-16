@@ -221,25 +221,29 @@ div[data-baseweb="select"] > div:focus-within {
   border-color: #4A7C3F !important;
   background: rgba(200,217,163,0.25) !important;
 }
-/* Fix doubled "Upload" button — nuke all child text, inject via ::after */
-[data-testid="stFileUploaderDropZone"] button {
+/* File uploader button — correct testid is lowercase 'z': stFileUploaderDropzone */
+[data-testid="stFileUploaderDropzone"] button {
   background: #FFFFFF !important;
   border: 1.5px solid rgba(60,60,50,0.22) !important;
   border-radius: 40px !important;
   padding: 8px 20px !important;
   box-shadow: none !important;
   width: auto !important;
-  font-size: 0 !important;        /* hide whatever Streamlit renders inside */
+  font-size: 0 !important;
 }
-[data-testid="stFileUploaderDropZone"] button * {
-  display: none !important;       /* belt-and-suspenders: hide all child nodes */
+[data-testid="stFileUploaderDropzone"] button * {
+  display: none !important;
 }
-[data-testid="stFileUploaderDropZone"] button::after {
+[data-testid="stFileUploaderDropzone"] button::after {
   content: "Browse Files";
   font-size: 13px !important;
   font-weight: 600 !important;
   color: #1A1A1A !important;
   font-family: "DM Sans", -apple-system, sans-serif !important;
+}
+/* Hide the instructions text — we have our own label above */
+[data-testid="stFileUploaderDropzoneInstructions"] {
+  display: none !important;
 }
 
 /* ── Buttons ── */
@@ -575,7 +579,7 @@ if "Process" in page:
         'Drop your ILPA PDF here, or click Browse Files  ·  PDF only</p>',
         unsafe_allow_html=True)
     uploaded = st.file_uploader(
-        "Upload PDF",
+        "pdf",
         type=["pdf"],
         label_visibility="collapsed",
     )
@@ -947,7 +951,7 @@ elif "Learn" in page:
             📄  Raw PDF
           </div>
         {card_close()}""", unsafe_allow_html=True)
-        ref_pdf = st.file_uploader("Reference PDF", type=["pdf"],
+        ref_pdf = st.file_uploader("pdf", type=["pdf"],
                                    key="learn_pdf", label_visibility="collapsed")
 
     with col_xl:
@@ -958,7 +962,7 @@ elif "Learn" in page:
             📊  Solved Excel Template
           </div>
         {card_close()}""", unsafe_allow_html=True)
-        ref_xl  = st.file_uploader("Solved Excel", type=["xlsx"],
+        ref_xl  = st.file_uploader("xlsx", type=["xlsx"],
                                    key="learn_xl", label_visibility="collapsed")
 
     st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
