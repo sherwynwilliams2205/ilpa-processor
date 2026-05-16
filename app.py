@@ -221,20 +221,25 @@ div[data-baseweb="select"] > div:focus-within {
   border-color: #4A7C3F !important;
   background: rgba(200,217,163,0.25) !important;
 }
-/* Fix doubled "Upload" button text — hide duplicate span */
-[data-testid="stFileUploaderDropZone"] button span:nth-child(2) {
-  display: none !important;
-}
+/* Fix doubled "Upload" button — nuke all child text, inject via ::after */
 [data-testid="stFileUploaderDropZone"] button {
   background: #FFFFFF !important;
-  border: 1.5px solid rgba(60,60,50,0.20) !important;
+  border: 1.5px solid rgba(60,60,50,0.22) !important;
   border-radius: 40px !important;
-  color: #1A1A1A !important;
-  font-size: 13px !important;
-  font-weight: 600 !important;
   padding: 8px 20px !important;
   box-shadow: none !important;
   width: auto !important;
+  font-size: 0 !important;        /* hide whatever Streamlit renders inside */
+}
+[data-testid="stFileUploaderDropZone"] button * {
+  display: none !important;       /* belt-and-suspenders: hide all child nodes */
+}
+[data-testid="stFileUploaderDropZone"] button::after {
+  content: "Browse Files";
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #1A1A1A !important;
+  font-family: "DM Sans", -apple-system, sans-serif !important;
 }
 
 /* ── Buttons ── */
