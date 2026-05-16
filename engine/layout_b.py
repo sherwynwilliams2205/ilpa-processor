@@ -110,8 +110,8 @@ def build_data(pdf_path: str, quarter: str = "") -> dict:
                 "F": -abs(get("interest_expense", 1)) if get("interest_expense", 1) else 0,
                 "G": -abs(get("interest_expense", 2)) if get("interest_expense", 2) else 0}
 
-    # Row 46 — Other Income: QTD/YTD=0; SI=Other Expenses SI as POSITIVE
-    other_exp_si = abs(get("other_expenses", 2)) if get("other_expenses", 2) else 0
+    # Row 46 — Other Income: QTD/YTD=0; SI=Other Expenses SI as NEGATIVE (Kelso convention)
+    other_exp_si = -abs(get("other_expenses", 2)) if get("other_expenses", 2) else 0
     rows[46] = {"E": 0, "F": 0, "G": other_exp_si}
 
     # Row 48 — Placement Fees: zero for Kelso
@@ -148,8 +148,9 @@ def build_data(pdf_path: str, quarter: str = "") -> dict:
     contrib_si = get("contributions", 2)
     rows[61] = {"E": 0, "F": 0, "G": -abs(contrib_si) if contrib_si else 0}
 
-    # Row 62 — Recallable SI (fixed derived figure)
-    rows[62] = {"E": 0, "F": 0, "G": RECALLABLE_SI}
+    # Row 62 — Recallable Distributions: 0 — Kelso convention, do not enter
+    # (G65 will not reconcile as a result — expected and accepted per skill.md)
+    rows[62] = {"E": 0, "F": 0, "G": 0}
 
     rows[63] = {"E": 0, "F": 0, "G": 0}
     rows[64] = {"E": 0, "F": 0, "G": 0}
@@ -177,8 +178,8 @@ CHECKS = [
     {"id": 4,  "label": "G10 = cumulative contributions SI",    "cell": "G10", "expected": "pdf_si_contrib", "fixed": None},
     {"id": 5,  "label": "G11 = cumulative distributions SI (−)","cell": "G11", "expected": "pdf_si_distrib", "fixed": None},
     {"id": 6,  "label": "E59 = $225,000,000 (commitment)",      "cell": "E59", "expected": "fixed",         "fixed": 225_000_000},
-    {"id": 7,  "label": "G62 = $132,229,801 (recallable SI)",   "cell": "G62", "expected": "fixed",         "fixed": 132_229_801},
-    {"id": 8,  "label": "E12 formula = E10-E11",                "cell": "E12", "expected": "formula",        "fixed": None},
+    {"id": 7,  "label": "E36 = Other Income/(Loss) QTD",         "cell": "E36", "expected": "pdf_other_income", "fixed": None},
+    {"id": 8,  "label": "G46 = Other Expenses SI (negative)",   "cell": "G46", "expected": "pdf_other_exp_si", "fixed": None},
     {"id": 9,  "label": "E16 = E25 (rows 17-24 all zero)",      "cell": "E16", "expected": "equals_e25",    "fixed": None},
     {"id": 10, "label": "Depletion SI = -$132,187 (footnote)",  "cell": "footnote", "expected": "fixed",    "fixed": -132_187},
 ]
