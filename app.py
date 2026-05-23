@@ -18,7 +18,7 @@ st.set_page_config(
     page_title="ILPA Processor · Albourne",
     page_icon="🔷",
     layout="wide",
-    initial_sidebar_state="collapsed",
+    initial_sidebar_state="expanded",
 )
 
 HISTORY_FILE = Path(__file__).parent / "history" / "runs.json"
@@ -141,53 +141,14 @@ section[data-testid="stSidebar"] {
   max-width: 216px !important;
   border-right: 1px solid rgba(255,255,255,0.06) !important;
 }
-/* ── Sidebar toggle: always pinned to left edge ─────────────── */
+/* ── Sidebar collapse/expand button — always visible ─────────── */
+[data-testid="stSidebarCollapseButton"],
 [data-testid="collapsedControl"] {
-  position: fixed !important;
-  left: 0 !important;
-  top: 50vh !important;
-  transform: translateY(-50%) !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  pointer-events: all !important;
-  z-index: 999999 !important;
-  width: 20px !important;
-  height: 48px !important;
-  background: #2C2F33 !important;
-  border-radius: 0 10px 10px 0 !important;
-  border: 1px solid rgba(255,255,255,0.12) !important;
-  border-left: none !important;
-  box-shadow: 2px 0 10px rgba(0,0,0,0.25) !important;
-  cursor: pointer !important;
-  transition: background 0.2s, width 0.2s !important;
-}
-[data-testid="collapsedControl"]:hover {
-  background: #3A3F47 !important;
-  width: 24px !important;
-}
-[data-testid="collapsedControl"] svg,
-[data-testid="collapsedControl"] button {
-  color: #F5F5F7 !important;
-  fill: #F5F5F7 !important;
-  background: transparent !important;
-  border: none !important;
-  padding: 0 !important;
-  width: 16px !important;
-  height: 16px !important;
-}
-/* Collapse button inside the open sidebar */
-[data-testid="stSidebarCollapseButton"] {
   visibility: visible !important;
   opacity: 1 !important;
   display: flex !important;
   pointer-events: all !important;
-}
-[data-testid="stSidebarCollapseButton"] svg {
-  color: rgba(255,255,255,0.7) !important;
-  fill: rgba(255,255,255,0.7) !important;
+  z-index: 9999 !important;
 }
 section[data-testid="stSidebar"] .stRadio > label { display: none !important; }
 section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] {
