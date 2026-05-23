@@ -141,7 +141,16 @@ section[data-testid="stSidebar"] {
   max-width: 216px !important;
   border-right: 1px solid rgba(255,255,255,0.06) !important;
 }
-/* Sidebar toggle button — always visible, dark pill */
+/* Sidebar toggle — always visible in BOTH states */
+[data-testid="collapsedControl"],
+[data-testid="stSidebarCollapseButton"] {
+  visibility: visible !important;
+  opacity: 1 !important;
+  display: flex !important;
+  pointer-events: all !important;
+  z-index: 999999 !important;
+}
+/* Style the collapsed-state toggle (arrow on left edge) */
 [data-testid="collapsedControl"] {
   background: #131416 !important;
   border-radius: 0 12px 12px 0 !important;
@@ -155,6 +164,15 @@ section[data-testid="stSidebar"] {
 [data-testid="collapsedControl"]:hover {
   background: #1E2023 !important;
   border-color: rgba(255,255,255,0.20) !important;
+}
+/* Style the expanded-state collapse button (inside sidebar) */
+[data-testid="stSidebarCollapseButton"] {
+  background: transparent !important;
+  color: rgba(255,255,255,0.7) !important;
+}
+[data-testid="stSidebarCollapseButton"]:hover {
+  background: rgba(255,255,255,0.08) !important;
+  color: #F5F5F7 !important;
 }
 section[data-testid="stSidebar"] .stRadio > label { display: none !important; }
 section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] {
