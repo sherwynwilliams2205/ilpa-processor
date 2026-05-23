@@ -18,7 +18,7 @@ st.set_page_config(
     page_title="ILPA Processor · Albourne",
     page_icon="🔷",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
 )
 
 HISTORY_FILE = Path(__file__).parent / "history" / "runs.json"
@@ -140,6 +140,21 @@ section[data-testid="stSidebar"] {
   min-width: 216px !important;
   max-width: 216px !important;
   border-right: 1px solid rgba(255,255,255,0.06) !important;
+}
+/* Sidebar toggle button — always visible, dark pill */
+[data-testid="collapsedControl"] {
+  background: #131416 !important;
+  border-radius: 0 12px 12px 0 !important;
+  border: 1px solid rgba(255,255,255,0.10) !important;
+  border-left: none !important;
+  color: #F5F5F7 !important;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.18) !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+[data-testid="collapsedControl"]:hover {
+  background: #1E2023 !important;
+  border-color: rgba(255,255,255,0.20) !important;
 }
 section[data-testid="stSidebar"] .stRadio > label { display: none !important; }
 section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] {
