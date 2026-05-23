@@ -103,7 +103,20 @@ st.markdown("""
   font-variant-numeric: tabular-nums;
 }
 
-#MainMenu, footer, header { visibility: hidden !important; }
+#MainMenu { visibility: hidden !important; }
+footer { visibility: hidden !important; }
+header { visibility: hidden !important; }
+/* But keep the sidebar toggle button visible — it's inside the header */
+header [data-testid="stSidebarNav"],
+header [data-testid="collapsedControl"],
+[data-testid="collapsedControl"],
+[data-testid="stSidebarCollapseButton"] {
+  visibility: visible !important;
+  opacity: 1 !important;
+  display: flex !important;
+  pointer-events: all !important;
+  z-index: 999999 !important;
+}
 .block-container {
   padding: 40px 48px 64px !important;
   max-width: 1100px !important;
