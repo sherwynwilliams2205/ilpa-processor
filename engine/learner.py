@@ -98,6 +98,35 @@ def learn(pdf_path: str, excel_path: str) -> dict:
     }
 
 
+def build_data_from_map(row_map: dict, pdf_numbers: dict) -> dict:
+    """
+    Run a learned row_map against fresh PDF numbers to produce row_data
+    ready for writer.write() — no files needed, works entirely in memory.
+
+    row_map   : output of learn()["row_map"]
+    pdf_numbers: output of extract()["numbers"]
+    Returns   : {row_int: {"E": val, "F": val, "G": val}}
+    """
+    rows = {}
+    for row, cells in row_map.items():
+        row_data = {}
+        for col_letter, info in cells.items():
+            t = info.get("type")
+            if t == "zero":
+                row_data[col_letter] = 0
+            elif t == "fixed":
+                row_data[col_letter] = info["value"]
+            elif t == "pdf":
+                vals  = pdf_numbers.get(info["field"], [])
+                col   = info["col"]
+                val   = vals[col] if col < len(vals) else 0
+                if val is None:
+                    val = 0
+                row_data[col_letter] = -abs(val) if info.get("negate") else val
+        rows[row] = row_data
+    return rows
+
+
 def _find_match(av: int, col_hint: int,
                 val_lookup: dict) -> tuple | None:
     """

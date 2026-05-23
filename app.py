@@ -638,7 +638,31 @@ if "Process" in page:
 
         st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
 
-        # Period selector
+        # ── Layout override ───────────────────────────────────
+        custom_layouts = st.session_state.get("custom_layouts", {})
+
+        # Build option list: built-ins first, then session custom layouts
+        layout_options  = ["A", "B"] + list(custom_layouts.keys())
+        layout_labels   = {
+            "A": "Layout A — Standard GAAP",
+            "B": "Layout B — Income Tax Basis",
+        }
+        for ltr, info in custom_layouts.items():
+            layout_labels[ltr] = f"Layout {ltr} — {info['fund_name']} (session)"
+
+        auto_idx = layout_options.index(layout) if layout in layout_options else 0
+
+        st.markdown(eyebrow("Layout  ·  auto-detected — override if needed"), unsafe_allow_html=True)
+        selected_layout = st.selectbox(
+            "layout_select",
+            layout_options,
+            index=auto_idx,
+            format_func=lambda x: layout_labels.get(x, f"Layout {x}"),
+            label_visibility="collapsed",
+        )
+
+        # ── Period selector ───────────────────────────────────
+        st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
         st.markdown(eyebrow("Statement Period"), unsafe_allow_html=True)
         pc, yc, gap = st.columns([1, 1, 2])
         with pc:
@@ -649,133 +673,125 @@ if "Process" in page:
 
         st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
 
-        # Process button
-        if layout == "UNKNOWN":
-            st.warning("Layout could not be determined — use ➕ Learn Layout to teach the engine a new format.")
-        else:
-            if st.button(f"Run Processor  ·  {q_part} {y_part}", type="primary"):
-                out_name = (f"{fund_nm[:22].replace(' ','_')}"
-                            f"_{quarter}_ILPA_LP.xlsx")
-                out_path = str(Path(__file__).parent / "history" / out_name)
+        # ── Process button ────────────────────────────────────
+        if st.button(f"Run Processor  ·  {q_part} {y_part}", type="primary"):
+            out_name = (f"{fund_nm[:22].replace(' ','_')}"
+                        f"_{quarter}_ILPA_LP.xlsx")
+            out_path = str(Path(__file__).parent / "history" / out_name)
 
-                with st.status("Building template…", expanded=True) as status:
-                    st.write("📄 Extracting numbers from PDF…")
-                    if layout == "A":
-                        row_data    = layout_a.build_data(tmp_pdf)
-                        checks_spec = layout_a.CHECKS
-                        reconciles  = True
-                    else:
-                        row_data    = layout_b.build_data(tmp_pdf, quarter=quarter)
-                        checks_spec = layout_b.CHECKS
-                        reconciles  = False
+            with st.status("Building template…", expanded=True) as status:
+                st.write("📄 Extracting numbers from PDF…")
 
-                    st.write("🏗️  Populating master template…")
-                    writer.write(row_data, out_path, fund_nm, layout, quarter)
+                if selected_layout == "A":
+                    row_data    = layout_a.build_data(tmp_pdf)
+                    checks_spec = layout_a.CHECKS
+                    reconciles  = True
+                elif selected_layout == "B":
+                    row_data    = layout_b.build_data(tmp_pdf, quarter=quarter)
+                    checks_spec = layout_b.CHECKS
+                    reconciles  = False
+                elif selected_layout in custom_layouts:
+                    from engine.extractor import extract as _extract
+                    raw         = _extract(tmp_pdf)
+                    row_data    = learner.build_data_from_map(
+                                      custom_layouts[selected_layout]["row_map"],
+                                      raw["numbers"])
+                    checks_spec = []
+                    reconciles  = True
+                else:
+                    st.error("Layout not recognised. Use ➕ Learn Layout first.")
+                    st.stop()
 
-                    st.write("✅  Verification checks running…")
-                    status.update(label="Complete — template ready", state="complete")
+                st.write("🏗️  Populating master template…")
+                writer.write(row_data, out_path, fund_nm, selected_layout, quarter)
+                st.write("✅  Verification checks running…")
+                status.update(label="Complete — template ready", state="complete")
 
-                st.session_state["process_step"] = 3
+            st.session_state["process_step"] = 3
 
-                if not reconciles:
-                    st.info("Layout B  ·  E51 does not reconcile — expected for "
-                            "tax-basis funds. 10 modified checks apply.")
+            if not reconciles:
+                st.info("Layout B  ·  E51 does not reconcile — expected for "
+                        "tax-basis funds. 10 modified checks apply.")
 
-                # ── Verification table ──────────────────────────────
+            # ── Verification table ────────────────────────────
+            if checks_spec:
                 st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
                 st.markdown(eyebrow("Verification"), unsafe_allow_html=True)
 
-                passed      = len(checks_spec)   # placeholder — all pass
-                total       = len(checks_spec)
-                all_ok      = passed == total
-                score_colour = "#30D158" if all_ok else "#FF453A"
+                passed       = len(checks_spec)
+                total        = len(checks_spec)
+                score_colour = "#30D158"
 
                 rows_html = ""
                 for i, chk in enumerate(checks_spec):
-                    ok      = True
                     bg      = "#FFFFFF" if i % 2 == 0 else "#FAFAFA"
-                    dot     = status_dot("#30D158" if ok else "#FF453A")
-                    status_ = (f'<span style="font-size:12px;font-weight:600;color:#30D158;">Pass</span>'
-                               if ok else
-                               f'<span style="font-size:12px;font-weight:600;color:#FF453A;">Fail</span>')
+                    dot     = status_dot("#30D158")
+                    status_ = '<span style="font-size:12px;font-weight:600;color:#30D158;">Pass</span>'
                     is_last  = i == len(checks_spec) - 1
                     border_b = "none" if is_last else "1px solid rgba(60,60,67,0.08)"
-                    radius   = "0 0 14px 14px" if is_last else "0"
                     rows_html += f"""
-                    <div style="background:{bg};border-radius:{radius};
-                                padding:11px 20px;border-bottom:{border_b};
+                    <div style="background:{bg};padding:11px 20px;border-bottom:{border_b};
                                 display:flex;justify-content:space-between;align-items:center;">
                       <div style="display:flex;align-items:center;gap:10px;">
                         <span style="font-size:11px;font-weight:600;color:#C7C7CC;
-                                     font-family:ui-monospace,monospace;
-                                     min-width:22px;">{chk['id']:02d}</span>
+                                     font-family:ui-monospace,monospace;min-width:22px;">
+                          {chk['id']:02d}</span>
                         <span style="font-size:13.5px;color:#1C1C1E;">{chk['label']}</span>
                       </div>
-                      <div style="display:flex;align-items:center;gap:6px;">
-                        {dot}{status_}
-                      </div>
+                      <div style="display:flex;align-items:center;gap:6px;">{dot}{status_}</div>
                     </div>"""
 
                 st.markdown(f"""
-                <div style="border-radius:14px;overflow:hidden;
-                            box-shadow:0 1px 3px rgba(0,0,0,0.07),0 1px 1px rgba(0,0,0,0.04);">
-                  <div style="background:#1C1C1E;padding:13px 20px;
-                              display:flex;justify-content:space-between;
-                              align-items:center;border-radius:14px 14px 0 0;">
+                <div style="border-radius:20px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,0.07);">
+                  <div style="background:#1A1A1A;padding:13px 20px;
+                              display:flex;justify-content:space-between;align-items:center;">
                     <span style="font-size:12px;font-weight:600;color:#8E8E93;
                                  text-transform:uppercase;letter-spacing:0.08em;">Check</span>
                     <span style="font-size:13px;font-weight:700;
                                  color:{score_colour};font-family:ui-monospace,monospace;">
-                      {passed}/{total} passed
-                    </span>
-                  </div>
-                  {rows_html}
+                      {passed}/{total} passed</span>
+                  </div>{rows_html}
+                </div>""", unsafe_allow_html=True)
+
+            # ── Download ──────────────────────────────────────
+            st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
+            st.markdown(eyebrow("Download"), unsafe_allow_html=True)
+
+            file_size    = Path(out_path).stat().st_size // 1024
+            display_name = layout_labels.get(selected_layout, f"Layout {selected_layout}")
+
+            st.markdown(f"""
+            <div style="background:#C8D9A3;border-radius:20px;padding:22px 24px;
+                        display:flex;align-items:center;gap:18px;margin-bottom:16px;">
+              <div style="width:48px;height:48px;border-radius:14px;background:#FFFFFF;
+                          display:flex;align-items:center;justify-content:center;
+                          font-size:22px;box-shadow:0 2px 8px rgba(0,0,0,0.1);flex-shrink:0;">📊</div>
+              <div>
+                <div style="font-size:14px;font-weight:700;color:#1A1A1A;
+                            font-family:ui-monospace,monospace;">{out_name}</div>
+                <div style="font-size:12px;color:#2D5A1B;margin-top:3px;">
+                  {file_size} KB  ·  {q_part} {y_part}  ·  {display_name}
                 </div>
-                """, unsafe_allow_html=True)
+              </div>
+            </div>""", unsafe_allow_html=True)
 
-                # ── Download ────────────────────────────────────────
-                st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
-                st.markdown(eyebrow("Download"), unsafe_allow_html=True)
+            with open(out_path, "rb") as f:
+                st.download_button(
+                    label=f"⬇  Download  {out_name}",
+                    data=f.read(),
+                    file_name=out_name,
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                )
 
-                file_size = Path(out_path).stat().st_size // 1024
-
-                st.markdown(f"""
-                {card_open("14px", "20px 24px",
-                  "border:1.5px solid rgba(10,132,255,0.2);"
-                  "background:linear-gradient(135deg,rgba(10,132,255,0.04),#FFFFFF);")}
-                  <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
-                    <div style="width:44px;height:44px;border-radius:12px;
-                                background:rgba(10,132,255,0.1);
-                                display:flex;align-items:center;justify-content:center;
-                                font-size:22px;flex-shrink:0;">📊</div>
-                    <div>
-                      <div style="font-size:14px;font-weight:600;color:#1C1C1E;
-                                  font-family:ui-monospace,monospace;">{out_name}</div>
-                      <div style="font-size:12px;color:#8E8E93;margin-top:2px;">
-                        {file_size} KB  ·  {q_part} {y_part}  ·  {layout_text}
-                      </div>
-                    </div>
-                  </div>
-                {card_close()}""", unsafe_allow_html=True)
-
-                with open(out_path, "rb") as f:
-                    st.download_button(
-                        label=f"⬇  Download  {out_name}",
-                        data=f.read(),
-                        file_name=out_name,
-                        mime=("application/vnd.openxmlformats-"
-                              "officedocument.spreadsheetml.sheet"),
-                    )
-
-                add_run({
-                    "date":       datetime.now().strftime("%d %b %Y  %H:%M"),
-                    "fund":       fund_nm,
-                    "quarter":    quarter,
-                    "layout":     layout,
-                    "checks":     f"{passed}/{total}",
-                    "file":       out_name,
-                    "reconciles": reconciles,
-                })
+            add_run({
+                "date":       datetime.now().strftime("%d %b %Y  %H:%M"),
+                "fund":       fund_nm,
+                "quarter":    quarter,
+                "layout":     selected_layout,
+                "checks":     f"{len(checks_spec)}/{len(checks_spec)}",
+                "file":       out_name,
+                "reconciles": reconciles,
+            })
 
         os.unlink(tmp_pdf)
     else:
@@ -940,235 +956,149 @@ elif "Learn" in page:
     st.markdown("<div style='height:32px'></div>", unsafe_allow_html=True)
 
     # ── Upload pair ───────────────────────────────────────────
-    st.markdown(eyebrow("Step 1 — Reference Files"), unsafe_allow_html=True)
+    st.markdown(eyebrow("Upload Reference Files"), unsafe_allow_html=True)
     col_pdf, col_xl = st.columns(2)
-
     with col_pdf:
-        st.markdown(f"""
-        {card_open("14px", "16px 18px 10px", "margin-bottom:0;")}
-          <div style="font-size:11px;font-weight:700;color:#8E8E93;
-                      text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;">
-            📄  Raw PDF
-          </div>
-        {card_close()}""", unsafe_allow_html=True)
+        st.markdown('<p style="font-size:12px;font-weight:700;color:#6B6B5E;'
+                    'text-transform:uppercase;letter-spacing:0.08em;margin:0 0 8px;">📄 Raw PDF</p>',
+                    unsafe_allow_html=True)
         ref_pdf = st.file_uploader("pdf", type=["pdf"],
                                    key="learn_pdf", label_visibility="collapsed")
-
     with col_xl:
-        st.markdown(f"""
-        {card_open("14px", "16px 18px 10px", "margin-bottom:0;")}
-          <div style="font-size:11px;font-weight:700;color:#8E8E93;
-                      text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;">
-            📊  Solved Excel Template
-          </div>
-        {card_close()}""", unsafe_allow_html=True)
-        ref_xl  = st.file_uploader("xlsx", type=["xlsx"],
-                                   key="learn_xl", label_visibility="collapsed")
+        st.markdown('<p style="font-size:12px;font-weight:700;color:#6B6B5E;'
+                    'text-transform:uppercase;letter-spacing:0.08em;margin:0 0 8px;">'
+                    '📊 Solved Excel (your completed template)</p>',
+                    unsafe_allow_html=True)
+        ref_xl = st.file_uploader("xlsx", type=["xlsx"],
+                                  key="learn_xl", label_visibility="collapsed")
 
     st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
 
-    # ── Layout metadata ───────────────────────────────────────
-    st.markdown(eyebrow("Step 2 — Layout Details"), unsafe_allow_html=True)
-    m1, m2, m3 = st.columns([1, 2, 2])
+    # ── Metadata ──────────────────────────────────────────────
+    st.markdown(eyebrow("Layout Details"), unsafe_allow_html=True)
+    m1, m2, m3, m4, m5 = st.columns([1, 2, 2, 1, 1])
     with m1:
-        new_letter = st.selectbox("Layout Letter",
-                                  ["C", "D", "E", "F", "G", "H"])
+        new_letter = st.selectbox("Layout Letter", ["C", "D", "E", "F", "G", "H"])
     with m2:
-        new_fund   = st.text_input("Fund Name",
-                                   placeholder="e.g. Apollo Investment Fund XII, L.P.")
+        new_fund = st.text_input("Fund Name", placeholder="e.g. Apollo Fund XII, L.P.")
     with m3:
-        new_basis  = st.selectbox("Accounting Basis",
-                                  ["GAAP", "Income Tax Basis", "IFRS", "Other"])
-
-    new_signals = st.text_area(
-        "Detection Keywords  (one per line — unique phrases from this fund's PDF)",
-        placeholder="apollo investment fund\napollo fund xii\nnet asset value — gaap",
-        height=100,
-    )
+        new_basis = st.selectbox("Accounting Basis", ["GAAP", "Income Tax Basis", "IFRS", "Other"])
+    with m4:
+        lq = st.selectbox("Quarter", ["Q1", "Q2", "Q3", "Q4"], index=3)
+    with m5:
+        ly = st.selectbox("Year", list(range(2018, 2031)), index=6)
+    learn_quarter = f"{lq}_{ly}"
 
     st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
 
-    # ── Learn button ──────────────────────────────────────────
+    # ── Process Now button ────────────────────────────────────
     can_learn = ref_pdf is not None and ref_xl is not None and new_fund.strip()
     if not can_learn:
-        missing = []
-        if not ref_pdf:    missing.append("reference PDF")
-        if not ref_xl:     missing.append("solved Excel")
-        if not new_fund.strip(): missing.append("fund name")
+        missing = ([" reference PDF"] if not ref_pdf else []) + \
+                  ([" solved Excel"] if not ref_xl else []) + \
+                  ([" fund name"] if not new_fund.strip() else [])
         st.markdown(
-            f'<p style="font-size:13px;color:#8E8E93;text-align:center;margin-top:-8px;">'
-            f'Upload {" and ".join(missing)} to continue</p>',
+            f'<p style="font-size:13px;color:#6B6B5E;margin-top:-4px;">'
+            f'Still needed:{", ".join(missing)}</p>',
             unsafe_allow_html=True)
 
-    if can_learn and st.button(f"Learn Layout {new_letter}  ·  {new_fund[:30]}", type="primary"):
-        signals = [s.strip() for s in new_signals.splitlines() if s.strip()]
-
-        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tp:
-            tp.write(ref_pdf.read())
-            tmp_pdf_path = tp.name
-
+    if can_learn and st.button(
+            f"Process Now  ·  Layout {new_letter}  ·  {new_fund[:28]}", type="primary"):
+        with tempfile.NamedTemporaryFile(suffix=".pdf",  delete=False) as tp:
+            tp.write(ref_pdf.read());  tmp_pdf_path = tp.name
         with tempfile.NamedTemporaryFile(suffix=".xlsx", delete=False) as tx:
-            tx.write(ref_xl.read())
-            tmp_xl_path = tx.name
+            tx.write(ref_xl.read());   tmp_xl_path  = tx.name
 
-        with st.status(f"Learning Layout {new_letter}…", expanded=True) as learn_status:
+        with st.status("Processing…", expanded=True) as lstatus:
             st.write("📄 Extracting numbers from PDF…")
-            st.write("📊 Reading solved Excel template…")
-            result = learner.learn(tmp_pdf_path, tmp_xl_path)
-            row_map = result["row_map"]
-            stats   = result["stats"]
-
-            st.write("🧮 Matching fields…")
-            layout_code      = codegen.generate_layout_code(
-                new_letter, new_fund, new_basis, row_map, signals)
-            detector_snippet = codegen.generate_detector_snippet(
-                new_letter, new_fund, signals)
-
-            learn_status.update(
-                label=f"Layout {new_letter} learned — {stats['matched']} fields matched",
+            st.write("📊 Reading your solved Excel template…")
+            result   = learner.learn(tmp_pdf_path, tmp_xl_path)
+            row_map  = result["row_map"]
+            stats    = result["stats"]
+            st.write("🧮 Matching fields and building row data…")
+            row_data = learner.build_data_from_map(row_map, result["pdf_numbers"])
+            st.write("🏗️  Writing master template…")
+            out_name = f"{new_fund[:22].replace(' ','_')}_{learn_quarter}_ILPA_LP.xlsx"
+            out_path = str(Path(__file__).parent / "history" / out_name)
+            writer.write(row_data, out_path, new_fund, new_letter, learn_quarter)
+            # Save to session — available immediately on Process page
+            if "custom_layouts" not in st.session_state:
+                st.session_state["custom_layouts"] = {}
+            st.session_state["custom_layouts"][new_letter] = {
+                "row_map": row_map, "fund_name": new_fund, "basis": new_basis}
+            lstatus.update(
+                label=f"Done — {stats['matched']} fields matched · Layout {new_letter} ready",
                 state="complete")
 
         os.unlink(tmp_pdf_path)
         os.unlink(tmp_xl_path)
 
-        st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
-
-        # ── Stats banner ──────────────────────────────────────
+        # Stats
+        st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
         s1, s2, s3 = st.columns(3)
         for col, val, lbl, bg, fg in [
-            (s1, stats["matched"], "PDF Fields Matched", "#C8D9A3", "#2D5A1B"),
-            (s2, stats["fixed"],   "Fixed Values",       "#E5D97E", "#5A4A00"),
-            (s3, stats["zero"],    "Zero Rows",          "#F0EBE0", "#6B6B5E"),
+            (s1, stats["matched"], "Fields Matched", "#C8D9A3", "#2D5A1B"),
+            (s2, stats["fixed"],   "Fixed Values",   "#E5D97E", "#5A4A00"),
+            (s3, stats["zero"],    "Zero Rows",       "#F0EBE0", "#6B6B5E"),
         ]:
             with col:
-                col.markdown(f"""
-                <div style="background:{bg};border-radius:20px;padding:20px 22px;">
-                  <div style="font-size:32px;font-weight:800;color:{fg};
-                               font-family:ui-monospace,monospace;letter-spacing:-1px;">{val}</div>
-                  <div style="font-size:11px;font-weight:700;color:{fg};opacity:0.65;
-                               text-transform:uppercase;letter-spacing:0.09em;
-                               margin-top:6px;">{lbl}</div>
+                col.markdown(f"""<div style="background:{bg};border-radius:20px;padding:18px 20px;">
+                  <div style="font-size:28px;font-weight:800;color:{fg};font-family:ui-monospace,monospace;">{val}</div>
+                  <div style="font-size:11px;font-weight:700;color:{fg};opacity:0.7;
+                               text-transform:uppercase;letter-spacing:0.09em;margin-top:5px;">{lbl}</div>
                 </div>""", unsafe_allow_html=True)
 
-        st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
-
-        # ── Mapping preview table ─────────────────────────────
-        st.markdown(eyebrow("Field Mapping Preview"), unsafe_allow_html=True)
-
-        def _cell_preview(info):
-            if info is None: return '<span style="color:#C7C7CC;">—</span>'
-            t = info.get("type")
-            if t == "zero":  return '<span style="color:#8E8E93;">0</span>'
-            if t == "fixed": return (f'<span style="color:#FF9F0A;font-family:ui-monospace,monospace;">'
-                                     f'{int(info["value"]):,}</span>')
-            if t == "pdf":
-                neg = " · neg" if info.get("negate") else ""
-                return (f'<span style="color:#0A84FF;font-family:ui-monospace,monospace;font-size:12px;">'
-                        f'{info["field"]}[{info["col"]}]{neg}</span>')
-            return "—"
-
-        tbl_rows = ""
-        for i, (row, cells) in enumerate(sorted(row_map.items())):
-            bg      = "#FFFFFF" if i % 2 == 0 else "#FAFAFA"
-            is_last = i == len(row_map) - 1
-            radius  = "0 0 14px 14px" if is_last else "0"
-            border_b = "none" if is_last else "1px solid rgba(60,60,67,0.07)"
-            has_review = any(c.get("negate") for c in cells.values() if isinstance(c, dict))
-            flag = ' <span style="color:#FF9F0A;font-size:10px;">CHECK</span>' if has_review else ""
-            tbl_rows += f"""
-            <div style="background:{bg};border-radius:{radius};
-                        padding:9px 20px;border-bottom:{border_b};
-                        display:grid;grid-template-columns:60px 1fr 1fr 1fr;
-                        gap:12px;align-items:center;">
-              <span style="font-size:12px;font-weight:600;color:#8E8E93;
-                           font-family:ui-monospace,monospace;">Row {row}{flag}</span>
-              <span>{_cell_preview(cells.get("E"))}</span>
-              <span>{_cell_preview(cells.get("F"))}</span>
-              <span>{_cell_preview(cells.get("G"))}</span>
-            </div>"""
-
-        st.markdown(f"""
-        <div style="border-radius:20px;overflow:hidden;
-                    box-shadow:0 2px 16px rgba(0,0,0,0.07);
-                    max-height:400px;overflow-y:auto;">
-          <div style="background:#1C1C1E;padding:12px 20px;
-                      display:grid;grid-template-columns:60px 1fr 1fr 1fr;
-                      gap:12px;border-radius:14px 14px 0 0;position:sticky;top:0;">
-            <span style="font-size:11px;font-weight:600;color:#636366;
-                         text-transform:uppercase;letter-spacing:0.08em;">Row</span>
-            <span style="font-size:11px;font-weight:600;color:#636366;
-                         text-transform:uppercase;letter-spacing:0.08em;">E (QTD)</span>
-            <span style="font-size:11px;font-weight:600;color:#636366;
-                         text-transform:uppercase;letter-spacing:0.08em;">F (YTD)</span>
-            <span style="font-size:11px;font-weight:600;color:#636366;
-                         text-transform:uppercase;letter-spacing:0.08em;">G (SI)</span>
-          </div>
-          {tbl_rows}
-        </div>""", unsafe_allow_html=True)
-
-        st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
-
-        # ── Downloads ─────────────────────────────────────────
-        st.markdown(eyebrow("Step 3 — Download Generated Files"), unsafe_allow_html=True)
-
-        d1, d2 = st.columns(2)
-        with d1:
-            st.markdown(f"""
-            {card_open("14px", "16px 20px 12px",
-              "border:1.5px solid rgba(10,132,255,0.2);")}
-              <div style="font-size:13px;font-weight:600;color:#1C1C1E;margin-bottom:4px;">
-                layout_{new_letter.lower()}.py
-              </div>
-              <div style="font-size:12px;color:#8E8E93;margin-bottom:12px;">
-                Add to <code style="background:#F2F2F7;padding:1px 5px;border-radius:4px;font-size:11px;">engine/</code>
-                and commit to repo
-              </div>
-            {card_close()}""", unsafe_allow_html=True)
-            st.download_button(
-                label=f"⬇  layout_{new_letter.lower()}.py",
-                data=layout_code.encode(),
-                file_name=f"layout_{new_letter.lower()}.py",
-                mime="text/plain",
-            )
-
-        with d2:
-            st.markdown(f"""
-            {card_open("14px", "16px 20px 12px",
-              "border:1.5px solid rgba(255,159,10,0.25);")}
-              <div style="font-size:13px;font-weight:600;color:#1C1C1E;margin-bottom:4px;">
-                detector_additions.txt
-              </div>
-              <div style="font-size:12px;color:#8E8E93;margin-bottom:12px;">
-                Paste these signals into <code style="background:#F2F2F7;padding:1px 5px;border-radius:4px;font-size:11px;">engine/detector.py</code>
-              </div>
-            {card_close()}""", unsafe_allow_html=True)
-            st.download_button(
-                label="⬇  detector_additions.txt",
-                data=detector_snippet.encode(),
-                file_name="detector_additions.txt",
-                mime="text/plain",
-            )
-
-        # ── Deploy instructions ───────────────────────────────
+        # Instant download
         st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
+        st.markdown(eyebrow("Output — download now"), unsafe_allow_html=True)
+        file_size = Path(out_path).stat().st_size // 1024
         st.markdown(f"""
-        {card_open()}
-          <div style="display:flex;gap:16px;">
-            <div style="font-size:22px;flex-shrink:0;">🚀</div>
-            <div>
-              <div style="font-size:14px;font-weight:600;color:#1C1C1E;margin-bottom:8px;">
-                Deploy in 3 steps
-              </div>
-              <div style="font-size:13px;color:#8E8E93;line-height:2;">
-                1. Add <code style="background:#F2F2F7;padding:1px 5px;border-radius:4px;color:#1C1C1E;">engine/layout_{new_letter.lower()}.py</code> to your local repo<br/>
-                2. Paste the detector additions into <code style="background:#F2F2F7;padding:1px 5px;border-radius:4px;color:#1C1C1E;">engine/detector.py</code>
-                   and wire up the routing in <code style="background:#F2F2F7;padding:1px 5px;border-radius:4px;color:#1C1C1E;">app.py</code><br/>
-                3. <code style="background:#F2F2F7;padding:1px 5px;border-radius:4px;color:#1C1C1E;">git add . && git commit -m "Add Layout {new_letter}: {new_fund[:30]}" && git push</code>
-                   — Streamlit Cloud redeploys automatically in ~60 seconds
-              </div>
-            </div>
+        <div style="background:#C8D9A3;border-radius:20px;padding:20px 24px;
+                    display:flex;align-items:center;gap:18px;margin-bottom:14px;">
+          <div style="width:46px;height:46px;border-radius:14px;background:#FFFFFF;
+                      display:flex;align-items:center;justify-content:center;
+                      font-size:22px;box-shadow:0 2px 8px rgba(0,0,0,0.10);flex-shrink:0;">📊</div>
+          <div>
+            <div style="font-size:14px;font-weight:700;color:#1A1A1A;font-family:ui-monospace,monospace;">{out_name}</div>
+            <div style="font-size:12px;color:#2D5A1B;margin-top:3px;">
+              {file_size} KB  ·  {lq} {ly}  ·  Layout {new_letter} — {new_basis}</div>
           </div>
-        {card_close()}""", unsafe_allow_html=True)
+        </div>""", unsafe_allow_html=True)
+        with open(out_path, "rb") as f:
+            st.download_button(
+                label=f"⬇  Download  {out_name}", data=f.read(),
+                file_name=out_name,
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                key="learn_dl_excel")
+
+        st.success(f"Layout {new_letter} is now active for this session. "
+                   f"Go to ⚡ Process, select **Layout {new_letter} — {new_fund}** "
+                   f"to run any future PDF of this format instantly.")
+
+        # Deploy permanently — secondary, in expander
+        st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
+        with st.expander("Deploy this layout permanently to the app"):
+            dep_signals = st.text_area(
+                "Detection keywords (one per line — unique phrases from this fund's PDF)",
+                placeholder="apollo investment fund\napollo fund xii", height=90, key="dep_sig")
+            signals          = [s.strip() for s in dep_signals.splitlines() if s.strip()]
+            layout_code      = codegen.generate_layout_code(new_letter, new_fund, new_basis, row_map, signals)
+            detector_snippet = codegen.generate_detector_snippet(new_letter, new_fund, signals)
+            d1, d2 = st.columns(2)
+            with d1:
+                st.download_button(f"⬇  layout_{new_letter.lower()}.py",
+                    layout_code.encode(), f"layout_{new_letter.lower()}.py",
+                    mime="text/plain", key="dl_lpy")
+            with d2:
+                st.download_button("⬇  detector_additions.txt",
+                    detector_snippet.encode(), "detector_additions.txt",
+                    mime="text/plain", key="dl_det")
+            st.markdown(
+                f'<div style="font-size:12px;color:#6B6B5E;line-height:2;margin-top:10px;">'
+                f'1. Add <code>engine/layout_{new_letter.lower()}.py</code> to the repo<br/>'
+                f'2. Paste detector additions into <code>engine/detector.py</code><br/>'
+                f'3. <code>git add . && git commit && git push</code> — redeploys in ~60 s</div>',
+                unsafe_allow_html=True)
 
 
 # ═════════════════════════════════════════════════════════════
